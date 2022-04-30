@@ -1,0 +1,129 @@
+package banking;
+
+import java.util.Scanner;
+
+public class AccountManager {
+
+	private Account[] accs;
+	private int numOfAccs;
+	
+	public AccountManager(int num) {
+
+		accs = new Account[num];
+		numOfAccs = 0;
+	}
+
+	public void makeAccount() {
+		Scanner scan = new Scanner(System.in);
+		String iAccNum, iName;
+		int iMoney;
+		int rate;
+		String grade;
+		System.out.println("1.보통계좌");
+		System.out.println("2.신용신뢰계좌");
+		System.out.println("선택 : "); int sel = scan.nextInt();
+		
+		System.out.println("계좌번호 : ");	iAccNum = scan.next();
+		System.out.println("고객이름 : ");	iName = scan.next();
+		System.out.println("잔고 : ");	iMoney = scan.nextInt();
+		System.out.print("기본이자%(정수형태로입력): "); rate = scan.nextInt();
+		if(sel == 1) {
+			NormalAccount normal = new NormalAccount(iAccNum, iName, iMoney, rate);
+			accs[numOfAccs++] = normal;
+		}
+		else if (sel == 2) {
+			System.out.print("신용등급(ABC): "); grade = scan.next();
+			HighCreditAccount high = new HighCreditAccount(iAccNum, iName, iMoney, rate, grade);
+			accs[numOfAccs++] = high;
+			
+		}
+	}
+	
+	void showAccInfo() {
+		for (int i =0; i<numOfAccs; i++) {
+			accs[i].showMenu();
+		}
+		System.out.println("==전체정보가 출력되었습니다.==");
+	}
+	
+	void depositMoney() {
+		boolean isFind = false;
+		try {
+			Scanner scan = new Scanner(System.in);
+			System.out.println("계좌번호와 입금할 금액을 입력하세요.");
+			System.out.print("계좌번호:"); String dAccNum = scan.next();
+			System.out.print("입금액:"); int dMoney = scan .nextInt();
+		
+			if (dMoney%500 !=0) {
+				System.out.println("500원 단위로만 입금 가능합니다.");
+			}
+			else {
+				for(int i =0; i<numOfAccs; i++) {
+					if(dAccNum.equals(accs[i].accNum)) {
+						accs[i].depositMoney(dMoney);
+						isFind = true;
+					}
+				}
+				if(isFind == false)
+					System.out.println("**찾는 정보가 없습니다.**");
+			}
+		}
+		
+		catch(Exception e) {
+			System.out.println("문자를 입력할수 없습니다.");
+		}
+	}
+	
+	void withdrawMoney() {
+		boolean isFind = false;
+		try {
+			Scanner scan = new Scanner(System.in);
+			System.out.println("계좌번호와 출금할 금액을 입력하세요.");
+			System.out.print("계좌번호:"); String wAccNum = scan.next();
+			System.out.print("출금액:"); int wMoney = scan .nextInt();
+			
+			if(wMoney<=0) {
+				System.out.println("출금이 불가능합니다.");
+			}
+				
+			else {
+				for(int i =0; i<numOfAccs; i++) {
+					if(wAccNum.equals(accs[i].accNum)) {
+					
+						if(wMoney > accs[i].money) {
+							System.out.print("잔고가 부족합니다. 금액전체를 출금할까요?(YES or NO) :");
+							String yesOrNo =scan.next();
+							if(yesOrNo.equals("YES")) {
+								wMoney = accs[i].money ;									accs[i].money -= wMoney;
+								System.out.println(accs[i].money + "가 출금되었습니다.");
+								System.out.println("남은금액은 " + accs[i].money +" 원 입니다.");
+							}
+							else {
+								System.out.println("출금요청취소");
+							}
+						}
+						
+						else {
+							if (wMoney%1000 !=0) {
+								System.out.println("1000원 단위로만 출력이 가능합니다.");
+								break;
+							}
+							else {
+								accs[i].money -=wMoney;
+								System.out.println(wMoney + " 원이 출금되었습니다.");
+								System.out.println("남은금액은 " + accs[i].money +" 원 입니다.");
+								isFind = true;
+								break;
+							}
+						}
+					}
+					if(isFind == false)
+						System.out.println("**찾는 정보가 없습니다.**");
+				}	
+			}
+		}
+		catch(Exception e) {
+			System.out.println("숫자를 입력해주세요.");
+		}
+	}
+}
